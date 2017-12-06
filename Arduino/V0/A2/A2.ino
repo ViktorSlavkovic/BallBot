@@ -6,17 +6,17 @@ const int kRecvIntPin = 2;
 
 volatile int recv_state = 0; // 0 - clear, 1 - 3b, 2 - 6b
 volatile uint8_t recv_byte = 0x55;
-//volatile uint8_t recv_correct = 0;
-//volatile unsigned long t = millis();
+volatile uint8_t recv_correct = 0;
+volatile unsigned long t = millis();
 
 
 void RecvIntRoutine() {
-//  unsigned long t1 = millis();
-//  unsigned long dt = t1 - t;
-//  if (dt < 300) return;
-//  if (dt > 1000) recv_state = CLEAR; 
+  unsigned long t1 = millis();
+  unsigned long dt = t1 - t;
+  if (dt < 1) return;
+  if (dt > 300) recv_state = 0; 
   
-  //Serial.println("RecvIntRoutine()");
+//  Serial.println("RecvIntRoutine()");
   uint8_t x = 0;
   for (int i = 0; i < 3; i++) {
     uint8_t mask = digitalRead(kRecvDataPins[i]) << i;
@@ -37,13 +37,13 @@ void RecvIntRoutine() {
     case 2: {
       recv_byte |= x << 6;
       recv_state = 0;
-      //Serial.print((int)recv_correct++); Serial.print("\t"); Serial.println((int)recv_byte);
+//      Serial.print((int)recv_correct++); Serial.print("\t"); Serial.println((int)recv_byte);
       Serial.write(recv_byte);
       break;
     }
   }
 
-//  t = t1;
+  t = t1;
 }
 
 int dir = HIGH;
