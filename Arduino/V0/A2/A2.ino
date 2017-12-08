@@ -1,7 +1,7 @@
 const int kStepPins[] = {12, 10, 8};
 const int kDirPins[] = {11, 9, 7};
 
-const int kRecvDataPins[] = {3, 4, 5, 6};
+const int kRecvDataPins[] = {3, 4, /*5,*/ 6};
 const int kRecvIntPin = 2;
 
 volatile int recv_state = 0; // 0 - clear, 1 - 3b, 2 - 6b
