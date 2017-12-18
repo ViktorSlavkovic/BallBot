@@ -1,6 +1,6 @@
 #include "MPUReader.h"
 
-void MPUReader::switchMpu(int i) {
+void MPUReader::SwitchMpus(int i) {
 		switch(i) {
 		case 0:
 			digitalWrite(muxSelectPins[0], LOW);
@@ -27,7 +27,7 @@ void MPUReader::InitializeMpus() {
 
 	// Initialize MPUs.
 	for (int i = 0; i < mpusNumber; i++) {
-		switchMpu(i);
+		SwitchMpus(i);
 		mpus[i].initialize();
 	
 		// If connection has not been established, report error and terminate exectution.
@@ -50,7 +50,7 @@ void MPUReader::InitializeMpus() {
 	}
 }
 
-void MPUReader::read(SharedBuffer<position_t> &sharedBuffer) {
+void MPUReader::Read(SharedBuffer<position_t> &sharedBuffer) {
 	position_t* position;
 	int fifoCount;
 	int fifoBuffer[fifoSize];
@@ -61,7 +61,7 @@ void MPUReader::read(SharedBuffer<position_t> &sharedBuffer) {
 	while (true) {
 		position = new position_t;
 		for (int i = 0; i < mpusNumber; i++) {
-			switchMpu(i);
+			SwitchMpus(i);
 
 			fifoCount = mpus[i].getFIFOCount();
 
@@ -75,6 +75,6 @@ void MPUReader::read(SharedBuffer<position_t> &sharedBuffer) {
 			mpus[i].dmpGetQuaternion(&quaternion, fifoBuffer);
 			mpus[i].dmpGetGravity(&position->positionArray[i], &quaternion);
 		}
-		sharedBuffer.put(position);
+		sharedBuffer.Put(position);
 	}
 }

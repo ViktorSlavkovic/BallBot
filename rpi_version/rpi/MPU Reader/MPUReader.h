@@ -15,7 +15,7 @@ struct position_t {
 class MPUReader {
 public:
 
-	static void read(SharedBuffer<position_t> &sharedBuffer);
+	static void Read(SharedBuffer<position_t> &sharedBuffer);
 
 private:
 	
@@ -26,7 +26,7 @@ private:
 	static const int fifoSize = 64;
 	static const int bufferLimit = 1024;
 
-	static void switchMpu(int i);
+	static void SwitchMpu(int i);
 
 	static void InitializeMpus();
 };

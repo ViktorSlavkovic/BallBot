@@ -17,10 +17,17 @@ public:
 
 	SharedBuffer(int max_number_of_elems = 100) : max_number_of_elems_(max_number_of_elems) {}
 
-	void push(T elem);
-	T pop();
-	int size();
-	bool empty();
+	void Push(T elem);
+	
+	// Pops an element from queue. Blocking call.
+	T Pop();
+
+	int Size();
+	bool Empty();
+
+	// Tries to pop an element, if there is no new element,
+	// reference to T is not changed. Non-blocking call.
+	bool Try_pop(T& t);
 
 };
 
