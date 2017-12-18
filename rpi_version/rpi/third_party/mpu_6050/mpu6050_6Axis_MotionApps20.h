@@ -41,6 +41,10 @@ THE SOFTWARE.
 
 #include "third_party/mpu_6050/mpu6050.h"
 //#include <avr/pgmspace.h>
+#include <time.h>
+#include <cstdio>
+#include <cstring>
+
 
 /* Source is from the InvenSense MotionApps v2 demo code. Original source is
  * unavailable, unless you happen to be amazing as decompiling binary by
@@ -293,7 +297,10 @@ uint8_t MPU6050::dmpInitialize() {
     // reset device
     DEBUG_PRINTLN(F("\n\nResetting MPU6050..."));
     reset();
-    usleep(30000); // wait after reset
+    {
+      timespec ts {.tv_sec =0, .tv_nsec = 30000000l};
+      nanosleep(&ts, nullptr); // wait after reset
+    }
 
     // enable sleep mode and wake cycle
     /*Serial.println(F("Enabling sleep mode..."));
@@ -344,7 +351,10 @@ uint8_t MPU6050::dmpInitialize() {
     setSlaveAddress(0, 0x68);
     DEBUG_PRINTLN(F("Resetting I2C Master control..."));
     resetI2CMaster();
-    usleep(20000);
+    {
+      timespec ts {.tv_sec =0, .tv_nsec = 20000000l};
+      nanosleep(&ts, nullptr); // wait after reset
+    };
 
     // load DMP code into memory banks
     DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));

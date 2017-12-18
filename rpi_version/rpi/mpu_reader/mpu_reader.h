@@ -4,13 +4,14 @@
 
 #include "third_party/i2c_dev/i2c_dev.h"
 #include "third_party/mpu_6050/mpu6050_6Axis_MotionApps20.h"
+#include "shared_buffer/shared_buffer.h"
 
-#define MPU_CONNECTION_FAILED 1;
-#define MPU_DMP_INIT_FAILED 2;
+#define MPU_CONNECTION_FAILED 1
+#define MPU_DMP_INIT_FAILED 2
 
 struct position_t {
-	VectorFloat[3] positionArray;
-}
+	VectorFloat positionArray[3];
+};
 
 class MPUReader {
 public:
@@ -19,14 +20,14 @@ public:
 
 private:
 	
+	static constexpr const int muxSelectPins[] = {0, 7};
+	static constexpr const int fifoSize = 64;
+	static constexpr const int bufferLimit = 1024;
+	static constexpr const int mpusNumber = 3;
 	static MPU6050 mpus[mpusNumber];
 	static int packetSize;
-	static const int mpusNumber 3;
-	static const int muxSelectPins[] = {0, 7};
-	static const int fifoSize = 64;
-	static const int bufferLimit = 1024;
 
-	static void SwitchMpu(int i);
+	static void SwitchMpus(int i);
 
 	static void InitializeMpus();
 };

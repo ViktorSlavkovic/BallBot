@@ -53,15 +53,14 @@ void MPUReader::InitializeMpus() {
 }
 
 void MPUReader::Read(SharedBuffer<position_t> &sharedBuffer) {
-	position_t* position;
+	position_t position;
 	int fifoCount;
-	int fifoBuffer[fifoSize];
+	uint8_t fifoBuffer[fifoSize];
 	Quaternion quaternion;		
 
 	InitializeMpus();
 
 	while (true) {
-		position = new position_t;
 		for (int i = 0; i < mpusNumber; i++) {
 			SwitchMpus(i);
 
@@ -75,8 +74,8 @@ void MPUReader::Read(SharedBuffer<position_t> &sharedBuffer) {
 			while ((fifoCount = mpus[i].getFIFOCount()) < packetSize); 
 	
 			mpus[i].dmpGetQuaternion(&quaternion, fifoBuffer);
-			mpus[i].dmpGetGravity(&position->positionArray[i], &quaternion);
+			mpus[i].dmpGetGravity(&position.positionArray[i], &quaternion);
 		}
-		sharedBuffer.Put(position);
+		sharedBuffer.Push(position);
 	}
 }

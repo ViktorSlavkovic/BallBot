@@ -1,13 +1,5 @@
 #include "motor_controller/motor_controller.h"
-
 #include <wiringPi.h>
-
-MotorControlCommand::MotorControlCommand(
-	uint8_t dir[] = {0, 0, 0}, 
-	uint8_t gear[] = {0, 0, 0}) {
-		this->dir = dir;
-		this->gear = gear;
-}
 
 void MotorController::Control(
     SharedBuffer<MotorControlCommand> &buffer) {
@@ -22,8 +14,8 @@ void MotorController::Control(
 		};
 		
 		for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
-			if (chrono::duration_cast<chrono::microseconds>
-				(start - std::chrono::system_clock::now()) 
+			if (std::chrono::duration_cast<std::chrono::microseconds>
+				(start - std::chrono::system_clock::now()).count()
 					>= GearToMicors(command.gear[i])) {
 				digitalWrite(kStepPins_[i], HIGH);
 				digitalWrite(kDirPins_[i], command.dir[i]);
@@ -38,10 +30,10 @@ void MotorController::Control(
 
 void MotorController::InitializeSteppers() {
 	for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
-   		pinMode(kStepPins[i], OUTPUT);
-   		pinMode(kDirPins[i], OUTPUT);
-   		digitalWrite(kStepPins[i], LOW);
-   		digitalWrite(kDirPins[i], LOW);
+   		pinMode(kStepPins_[i], OUTPUT);
+   		pinMode(kDirPins_[i], OUTPUT);
+   		digitalWrite(kStepPins_[i], LOW);
+   		digitalWrite(kDirPins_[i], LOW);
 	}
 }
 

@@ -49,6 +49,8 @@ THE SOFTWARE.
 #define FALSE	(0==1)
 #endif
 
+#include <cinttypes>
+
 class I2Cdev {
     public:
         I2Cdev();
