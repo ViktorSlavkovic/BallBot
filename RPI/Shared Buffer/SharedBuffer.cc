@@ -1,12 +1,8 @@
 #include "SharedBuffer"
 
-void SharedBuffer::push(T* elem) {
+void SharedBuffer::push(T elem) {
 	std::unique_lock<std::mutex> mlock(mutex_);
-		
-	if (elem == nullptr) {
-		return;
-	}
-
+	
 	if (queue_.size() == max_number_of_elems_) {
 		queue_.pop();
 	}
@@ -15,14 +11,14 @@ void SharedBuffer::push(T* elem) {
 	cond_.notify_one();
 }
 
-T* SharedBuffer::pop() {
+T SharedBuffer::pop() {
 	std::unique_lock<std::mutex> mlock(mutex_);
 
 	while (queue_.empty()) {
 		cond_.wait(mlock);	
 	}
 
-	T* result = queue_.front();
+	auto result = queue_.front();
 	queue_.pop();
 
 	return result;
