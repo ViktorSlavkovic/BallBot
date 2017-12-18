@@ -13,6 +13,12 @@ struct position_t {
 }
 
 class MPUReader {
+public:
+
+	static void read(SharedBuffer<position_t> &sharedBuffer);
+
+private:
+	
 	static MPU6050 mpus[mpusNumber];
 	static int packetSize;
 	static const int mpusNumber 3;
@@ -23,9 +29,6 @@ class MPUReader {
 	static void switchMpu(int i);
 
 	static void InitializeMpus();
-public:
-
-	static void read(SharedBuffer<position_t> &sharedBuffer);
 };
 
 
