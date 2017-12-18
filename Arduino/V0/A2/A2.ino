@@ -119,31 +119,33 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(kRecvIntPin), RecvIntRoutine, RISING);
 }
 
+bool dir = true;
+
 // TODO(viktors): Check for possible direction change issues - maybe add a small delay.
 // TODO(viktors): Implement.
 void loop() {
-////  int t= millis();
-////  int t1;
-//  for (int i = 0; i < 200; i++) {
-////  for (int i = 8; i < 9; i++) { 
-////    while ((t1 = millis()) - t < 2000) {
-//      for (int j = 0; j < 3; j++) {
-//        digitalWrite(kStepPins[j], HIGH);
-//      }
-//      delayMicroseconds(500/*stepTime[i]*/);                      
-//      for (int j = 0; j < 3; j++) {
-//        digitalWrite(kStepPins[j], LOW);
-//      }
-//      delayMicroseconds(500/*stepTime[i]*/);
-////    }
-////    t = t1;
-////  }
+//  int t= millis();
+//  int t1;
+  for (int i = 0; i < 200; i++) {
+//  for (int i = 8; i < 9; i++) { 
+//    while ((t1 = millis()) - t < 2000) {
+      for (int j = 0; j < 3; j++) {
+        digitalWrite(kStepPins[j], HIGH);
+      }
+      delayMicroseconds(500/*stepTime[i]*/);                      
+      for (int j = 0; j < 3; j++) {
+        digitalWrite(kStepPins[j], LOW);
+      }
+      delayMicroseconds(500/*stepTime[i]*/);
+//    }
+//    t = t1;
 //  }
-//
-//  dir = !dir;
-//  for (int i = 0; i < 3; i++) {
-//    digitalWrite(kDirPins[i], dir);
-//  }
-//
-//  delay(1000);
+  }
+
+  dir = !dir;
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(kDirPins[i], dir);
+  }
+
+  delay(1000);
 }
