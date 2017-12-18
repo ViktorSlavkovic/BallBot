@@ -1,0 +1,10 @@
+# grid
+set grid
+
+# ranges
+set autoscale
+set xrange [0:0.5]
+set yrange [-1:1]
+
+plot 'out.csv' with lines
+
