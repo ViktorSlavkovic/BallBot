@@ -51,7 +51,7 @@ void MPUReader::InitializeMpus() {
 }
 
 void MPUReader::read(SharedBuffer<position_t> &sharedBuffer) {
-	position_t position;
+	position_t* position;
 	int fifoCount;
 	int fifoBuffer[fifoSize];
 	Quaternion quaternion;		
@@ -59,6 +59,7 @@ void MPUReader::read(SharedBuffer<position_t> &sharedBuffer) {
 	InitializeMpus();
 
 	while (true) {
+		position = new position_t;
 		for (int i = 0; i < mpusNumber; i++) {
 			switchMpu(i);
 
@@ -72,9 +73,8 @@ void MPUReader::read(SharedBuffer<position_t> &sharedBuffer) {
 			while ((fifoCount = mpus[i].getFIFOCount()) < packetSize); 
 	
 			mpus[i].dmpGetQuaternion(&quaternion, fifoBuffer);
-			mpus[i].dmpGetGravity(&(position.positionArray[i]), &quaternion);
-			
-			sharedBuffer.put(position);
+			mpus[i].dmpGetGravity(&position->positionArray[i], &quaternion);
 		}
+		sharedBuffer.put(position);
 	}
 }
