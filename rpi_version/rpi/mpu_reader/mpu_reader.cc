@@ -1,4 +1,6 @@
-#include "MPUReader.h"
+#include "mpu_reader/mpu_reader.h"
+
+#include <wiringPi.h>
 
 void MPUReader::SwitchMpus(int i) {
 		switch(i) {

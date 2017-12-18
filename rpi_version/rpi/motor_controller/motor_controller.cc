@@ -1,4 +1,6 @@
-#include "MotorController.h"
+#include "motor_controller/motor_controller.h"
+
+#include <wiringPi.h>
 
 MotorControlCommand::MotorControlCommand(
 	uint8_t dir[] = {0, 0, 0}, 
