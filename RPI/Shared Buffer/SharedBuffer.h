@@ -1,42 +1,27 @@
-#include "SharedBuffer"
+#ifndef SHARED_BUFFER_H
+#define SHARED_BUFFER_H
 
-void SharedBuffer::push(T* elem) {
-	std::unique_lock<std::mutex> mlock(mutex_);
-		
-	if (elem == nullptr) {
-		return;
-	}
+#include <mutex>
+#include <queue>
+#include <condition_variable>
 
-	if (queue_.size() == max_number_of_elems_) {
-		queue_.pop();
-	}
+template <class T>
+class SharedBuffer {
+	unsigned int max_number_of_elems_;
 
-	queue_.push(elem);
-	cond_.notify_one();
-}
+	std::queue<T *> queue_;
+	std::mutex mutex_;
+	std::condition_variable cond_;
 
-T* SharedBuffer::pop() {
-	std::unique_lock<std::mutex> mlock(mutex_);
+public:
 
-	while (queue_.empty()) {
-		cond_.wait(mlock);	
-	}
+	SharedBuffer(int max_number_of_elems = 100) : max_number_of_elems_(max_number_of_elems) {}
 
-	T* result = queue_.front();
-	queue_.pop();
+	void push(T* elem);
+	T* pop();
+	int size();
+	bool empty();
 
-	return result;
-}
+};
 
-int SharedBuffer::size() {
-	std::unique_lock<std::mutex> mlock(mutex_);
-	
-	return queue_.size();
-}
-
-
-bool SharedBuffer::empty() {
-	std::unique_lock<std::mutex> mlock(mutex_);
-
-	return queue_.empty();
-}
+#endif
