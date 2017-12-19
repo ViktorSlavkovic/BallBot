@@ -1,4 +1,4 @@
-#include "motor_controller/motor_controller.h"
+#include "motor_controller.h"
 #include <wiringPi.h>
 
 constexpr const int MotorController::kStepPins_[];

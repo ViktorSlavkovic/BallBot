@@ -3,7 +3,7 @@
 
 #define NUMBER_OF_STEPPERS 3
 
-#include "shared_buffer/shared_buffer.h"
+#include "util/shared_buffer.h"
 
 #include <chrono>
 #include <cstring>

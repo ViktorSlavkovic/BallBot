@@ -1,4 +1,4 @@
-#include "mpu_reader/mpu_reader.h"
+#include "mpu_reader.h"
 
 #include <wiringPi.h>
 
