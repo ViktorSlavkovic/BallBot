@@ -2,6 +2,13 @@
 
 #include <wiringPi.h>
 
+constexpr const int MPUReader::muxSelectPins[];
+constexpr const int MPUReader::fifoSize;
+constexpr const int MPUReader::bufferLimit;
+constexpr const int MPUReader::mpusNumber;
+MPU6050 MPUReader::mpus[mpusNumber];
+int MPUReader::packetSize;
+
 void MPUReader::SwitchMpus(int i) {
 		switch(i) {
 		case 0:

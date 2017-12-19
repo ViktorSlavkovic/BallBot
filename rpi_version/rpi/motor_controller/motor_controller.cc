@@ -1,6 +1,10 @@
 #include "motor_controller/motor_controller.h"
 #include <wiringPi.h>
 
+constexpr const int MotorController::kStepPins_[];
+constexpr const int MotorController::kDirPins_[];
+constexpr const int MotorController::kNumberOfSteppers_;
+
 void MotorController::Control(
     SharedBuffer<MotorControlCommand> &buffer) {
 	InitializeSteppers();

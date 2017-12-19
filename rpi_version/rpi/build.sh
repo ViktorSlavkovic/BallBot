@@ -53,6 +53,7 @@ rpi_code_dir="BB"
 
 if [ "$HOSTNAME" == "$rpi_hostname" ]; then
   echo "Running a remote build..."
+  mkdir $rpi_code_dir 2> /dev/null
   cd $rpi_code_dir
   base_directory=$PWD
   compile "."
