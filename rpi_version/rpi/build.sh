@@ -29,7 +29,7 @@ function compile {
       fi
       cd $base_directory/$path/
       # g++ -I$base_directory/ -O3 -c $f -o $base_directory/objs/$path/$base_noext.o
-      g++ --std=c++0x -I$base_directory/ -g -c $f -o $base_directory/objs/$path/$base_noext.o -lwiringPi
+      g++ --std=c++0x -I$base_directory/ -g -c $f -o $base_directory/objs/$path/$base_noext.o
       if [[ $? -ne 0 ]]; then
         echo -e "${RED}^ ${base}${NC}"
         cd - > /dev/null
@@ -57,9 +57,10 @@ if [ "$HOSTNAME" == "$rpi_hostname" ]; then
   cd $rpi_code_dir
   base_directory=$PWD
   compile "."
-  g++ --std=c++0x -g $obj_files_list -o $base_directory/run -lwiringPi
+  g++ --std=c++0x -g $obj_files_list -o $base_directory/run -lwiringPi -lpthread
 else
   echo "Uploading code to the Raspberry Pi..."
+  fusermount -u $rpi_mtpt 2> /dev/null
   rm -rf $rpi_mtpt
   mkdir $rpi_mtpt
   echo "$rpi_pass" | sshfs $rpi_user@$rpi_ip: $rpi_mtpt -C -o password_stdin -o workaround=rename

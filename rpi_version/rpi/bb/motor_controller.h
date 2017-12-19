@@ -5,10 +5,6 @@
 
 #include "util/shared_buffer.h"
 
-#include <chrono>
-#include <cstring>
-#include <ctime>
-
 namespace bb {
 
 using util::SharedBuffer;
@@ -44,8 +40,7 @@ private:
   static constexpr const int kNumberOfSteppers_ = 3;
 
   static void InitializeSteppers();
-
-  static uint32_t GearToMicors(uint8_t gear);
+  static uint64_t GearToMicors(uint8_t gear);
 };
 
 };  // namespace bb

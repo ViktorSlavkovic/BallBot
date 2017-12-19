@@ -1,34 +1,48 @@
 #include "motor_controller.h"
 #include <wiringPi.h>
 
+#include <cstdio>
+#include <cstring>
+#include <thread>
+
 namespace bb {
 
 constexpr const int MotorController::kStepPins_[];
 constexpr const int MotorController::kDirPins_[];
 constexpr const int MotorController::kNumberOfSteppers_;
 
-void MotorController::Control(SharedBuffer<MotorControlCommand> &buffer) {
+void MotorController::Control(SharedBuffer<MotorControlCommand>& buffer) {
   InitializeSteppers();
 
   MotorControlCommand command;
 
-  auto start = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> t0[3] = {
+    std::chrono::system_clock::now(),
+    std::chrono::system_clock::now(),
+    std::chrono::system_clock::now()
+  };
+  
   while (true) {
-    if (buffer.TryPop(command)) {
-      start = std::chrono::system_clock::now();
-    }
+    buffer.TryPop(command);
     
+    auto t = std::chrono::system_clock::now();    
+    bool tick = false;
     for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
-      if (std::chrono::duration_cast<std::chrono::microseconds>
-        (start - std::chrono::system_clock::now()).count() >=
-            GearToMicors(command.gear[i])) {
+      if (std::chrono::duration_cast<std::chrono::microseconds>(t - t0[i])
+          .count() >= GearToMicors(command.gear[i])) {
+        digitalWrite(kDirPins_[i], command.dir[i]);              
         digitalWrite(kStepPins_[i], HIGH);
-        digitalWrite(kDirPins_[i], command.dir[i]);
+        tick = true;
+        t0[i] = t;
       }
     }
-
-    for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
-      digitalWrite(kDirPins_[i], LOW);
+    
+    if (tick) {
+      std::this_thread::sleep_for(std::chrono::microseconds(300));
+      for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
+        digitalWrite(kStepPins_[i], LOW);
+      }
+      std::this_thread::sleep_for(std::chrono::microseconds(300));
     }
   }
 }
@@ -42,9 +56,13 @@ void MotorController::InitializeSteppers() {
   }
 }
 
-uint32_t MotorController::GearToMicors(uint8_t gear) {
+constexpr uint64_t kMinGearStepMicros = 100000; // 100 ms
+constexpr uint64_t kMaxGearStepMicros = 800; // 0.8 ms
+
+uint64_t MotorController::GearToMicors(uint8_t gear) {
   if (!gear) return ~uint64_t(0);
-  return (1 + (63 - gear) * 64llu) * 100;
+  uint64_t step = (kMinGearStepMicros - kMaxGearStepMicros) / 254;
+  return kMaxGearStepMicros + (255 - gear) * step;
 }
 
 }; //namespace bb
