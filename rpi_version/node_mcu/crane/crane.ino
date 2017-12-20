@@ -19,7 +19,7 @@ void setup() {
   // Motor control pins init.
   pinMode(D3, OUTPUT);
   pinMode(D4, OUTPUT);
-  digitalWrite(D3, LOW);
+  digitalWrite(D3, HIGH);
   digitalWrite(D4, HIGH);
   // Connect to WiFi.
   WiFi.config(ip, gateway, subnet); 
@@ -37,18 +37,18 @@ void setup() {
 void MotorControl(int action) {
   switch(action) {
     case 1: {
-      digitalWrite(D3, HIGH);
-      digitalWrite(D4, LOW);
-      break;
-    }
-    case 2: {
       digitalWrite(D3, LOW);
       digitalWrite(D4, HIGH);
       break;
     }
-    default: {
-      digitalWrite(D3, LOW);
+    case 2: {
+      digitalWrite(D3, HIGH);
       digitalWrite(D4, LOW);
+      break;
+    }
+    default: {
+      digitalWrite(D3, HIGH);
+      digitalWrite(D4, HIGH);
       break;
     }
   }
@@ -62,11 +62,11 @@ void loop() {
     udp_server.read(buffer, kBufferSize);
     if (memcmp(buffer, "UP", 2) == 0) {
       MotorControl(1);
-      delay(1000);
+      delay(100);
       MotorControl(0);
     } else if (memcmp(buffer, "DOWN", 4) == 0) {
       MotorControl(2);
-      delay(1000);
+      delay(100);
       MotorControl(0);
     }
   }   
