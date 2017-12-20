@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include <string.h>
 #include <stdint.h>
 #include "third_party/mpu_6050/mpu6050.h"
+#include "third_party/mpu_6050/mpu6050_6Axis_MotionApps20.h"
 
 /** Default constructor, uses default I2C address.
  * @see MPU6050_DEFAULT_ADDRESS

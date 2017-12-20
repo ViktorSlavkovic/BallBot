@@ -55,6 +55,8 @@ class I2Cdev {
     public:
         I2Cdev();
         
+        static void SetBus(int bus);
+
         static int8_t readBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t *data, uint16_t timeout=I2Cdev::readTimeout);
         static int8_t readBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t *data, uint16_t timeout=I2Cdev::readTimeout);
         static int8_t readBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data, uint16_t timeout=I2Cdev::readTimeout);
@@ -74,6 +76,9 @@ class I2Cdev {
         static bool writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t *data);
 
         static uint16_t readTimeout;
+        static int bus;
+
+        static int fd;
 };
 
 #endif /* _I2CDEV_H_ */

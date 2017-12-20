@@ -43,6 +43,8 @@ THE SOFTWARE.
 
 #define pgm_read_byte(p) (*(uint8_t *)(p))
 
+#define MPU6050_INCLUDE_DMP_MOTIONAPPS20
+#include "third_party/mpu_6050/helper_3dmath.h"
 
 #define MPU6050_ADDRESS_AD0_LOW     0x68 // address pin low (GND), default for InvenSense evaluation board
 #define MPU6050_ADDRESS_AD0_HIGH    0x69 // address pin high (VCC)
@@ -774,10 +776,10 @@ class MPU6050 {
         uint8_t getDMPConfig1();
         void setDMPConfig1(uint8_t config);
 
-        // DMP_CFG_2 register
+        // DMP_CFG_2 registerMPU6050_INCLUDE_DMP_MOTIONAPPS20
         uint8_t getDMPConfig2();
         void setDMPConfig2(uint8_t config);
-
+        
         // special methods for MotionApps 2.0 implementation
         #ifdef MPU6050_INCLUDE_DMP_MOTIONAPPS20
             uint8_t *dmpPacketBuffer;

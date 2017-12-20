@@ -173,7 +173,7 @@ int8_t I2Cdev::readWord(uint8_t devAddr, uint8_t regAddr, uint16_t *data, uint16
  */
 int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout) {
     int8_t count = 0;
-    int fd = open(kDevice, O_RDWR);
+    int fd = open(bus == 0 ? "/dev/i2c-0" : "/dev/i2c-1", O_RDWR);
 
     if (fd < 0) {
         fprintf(stderr, "Failed to open device: %s\n", strerror(errno));
@@ -185,13 +185,13 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
         return(-1);
     }
     if (write(fd, &regAddr, 1) != 1) {
-        fprintf(stderr, "Failed to write reg: %s\n", strerror(errno));
+        fprintf(stderr, "Failed to write reg: %d %s\n", errno, strerror(errno));
         close(fd);
         return(-1);
     }
     count = read(fd, data, length);
     if (count < 0) {
-        fprintf(stderr, "Failed to read device(%d): %s\n", count, ::strerror(errno));
+        fprintf(stderr, "Failed to read device(%d): %d %s\n", count, errno, ::strerror(errno));
         close(fd);
         return(-1);
     } else if (count != length) {
@@ -345,7 +345,7 @@ bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_
         return(FALSE);
     }
 
-    fd = open(kDevice, O_RDWR);
+    fd = open(bus == 0 ? "/dev/i2c-0" : "/dev/i2c-1", O_RDWR);
     if (fd < 0) {
         fprintf(stderr, "Failed to open device: %s\n", strerror(errno));
         return(FALSE);
@@ -359,7 +359,7 @@ bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_
     memcpy(buf+1,data,length);
     count = write(fd, buf, length+1);
     if (count < 0) {
-        fprintf(stderr, "Failed to write device(%d): %s\n", count, ::strerror(errno));
+        fprintf(stderr, "Failed to write device(%d): %d %s\n", count, errno, ::strerror(errno));
         close(fd);
         return(FALSE);
     } else if (count != length+1) {
@@ -392,7 +392,7 @@ bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16
         return(FALSE);
     }
 
-    fd = open(kDevice, O_RDWR);
+    fd = open(bus == 0 ? "/dev/i2c-0" : "/dev/i2c-1", O_RDWR);
     if (fd < 0) {
         fprintf(stderr, "Failed to open device: %s\n", strerror(errno));
         return(FALSE);
@@ -409,7 +409,7 @@ bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16
     }
     count = write(fd, buf, length*2+1);
     if (count < 0) {
-        fprintf(stderr, "Failed to write device(%d): %s\n", count, ::strerror(errno));
+        fprintf(stderr, "Failed to write device(%d): %d %s\n", count, errno, ::strerror(errno));
         close(fd);
         return(FALSE);
     } else if (count != length*2+1) {
@@ -425,4 +425,10 @@ bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16
  * Set this to 0 to disable timeout detection.
  */
 uint16_t I2Cdev::readTimeout = 0;
+
+int I2Cdev::bus = 0;
+
+void I2Cdev::SetBus(int bus) {
+    I2Cdev::bus = bus;
+}
 
