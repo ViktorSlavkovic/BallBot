@@ -1,4 +1,4 @@
-const char* kDevice = "/dev/i2c-1";
+const char* kDevice = "/dev/i2c-0";
 // I2Cdev library collection - Main I2C device class
 // Abstracts bit and byte I2C R/W functions into a convenient class
 // 6/9/2012 by Jeff Rowberg <jeff@rowberg.net>
@@ -429,6 +429,6 @@ uint16_t I2Cdev::readTimeout = 0;
 int I2Cdev::bus = 0;
 
 void I2Cdev::SetBus(int bus) {
-    I2Cdev::bus = bus;
+    I2Cdev::bus = 0;
 }
 
