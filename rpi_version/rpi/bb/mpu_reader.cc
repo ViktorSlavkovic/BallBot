@@ -68,14 +68,20 @@ void MPUReader::Read(SharedBuffer<Gravity>& buffer) {
     fifoCount = mpu.getFIFOCount();
 
     if (fifoCount == bufferLimit) {
+      printf("Overflow!\n");
       mpu.resetFIFO();
     }
-
+again:
     // Wait for new data to be available
     while ((fifoCount = mpu.getFIFOCount()) < packetSize) {}
     mpu.getFIFOBytes(fifoBuffer, packetSize);
     mpu.dmpGetQuaternion(&quaternion, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &quaternion);
+    if (gravity.getMagnitude() > 1.1) {
+      printf("Bad gravity!\n");
+      mpu.resetFIFO();
+      goto again;
+    }
     // printf("%d: %7.2f, %7.2f, %7.2f\n", 
     //        gravity[i].y,
     //        gravity[i].z);
