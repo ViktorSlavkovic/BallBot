@@ -57,7 +57,7 @@ if [ "$HOSTNAME" == "$rpi_hostname" ]; then
   cd $rpi_code_dir
   base_directory=$PWD
   compile "."
-  g++ --std=c++0x -g $obj_files_list -o $base_directory/run -lwiringPi -lpthread
+  g++ --std=c++0x -g $obj_files_list -o $base_directory/run -lboost_system -lwiringPi -lpthread
 else
   echo "Uploading code to the Raspberry Pi..."
   fusermount -u $rpi_mtpt 2> /dev/null
