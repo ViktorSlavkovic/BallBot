@@ -2,6 +2,7 @@
 #include "bb/mpu_reader.h"
 #include "bb/pid_controller.h"
 #include "util/shared_buffer.h"
+#include "bb/udp_sender.h"
 #include "bb/command_receiver.h"
 
 #include <chrono>
@@ -15,10 +16,24 @@
 int main(int argc, char* argv[]) {
   wiringPiSetup();
 
+  std::string ipAddr = "192.168.1.10";
+
+  util::SharedBuffer<std::string> udp_sender_buffer;
+  std::thread udp_sender_thread(bb::UDPSender::Send,
+                                std::ref(udp_sender_buffer),
+                                ipAddr);
+              
   util::SharedBuffer<bb::DirectionCommand> direction_buffer;
-  std::thread motor_controller_thread(bb::CommandReceiver::Receive,
+  std::thread command_receiver_thread(bb::CommandReceiver::Receive,
                                       std::ref(direction_buffer),
                                       54321);
+
+  std::thread pid_controller_thread(bb::PidController::Control,
+                                    std::ref(udp_sender_buffer),
+                                    std::ref(direction_buffer));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  
 
   // util::SharedBuffer<bb::MotorControlCommand> motors_buffer;
   // util::SharedBuffer<bb::MPUReader::Gravity> sensors_buffer;
