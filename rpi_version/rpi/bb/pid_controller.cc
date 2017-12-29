@@ -163,4 +163,26 @@ void PidController::Control(
   }
 }
 
+  void PidController::Control(
+    SharedBuffer<std::string>& buffer_udp_sender,
+    SharedBuffer<bb::DirectionCommand>& buffer_direction){
+    while (true) {
+      std::string message;
+      switch (buffer_direction.Pop()) {
+        case DirectionCommand::FORWARD:
+          message = "FORWARD received.";
+          break;
+        case DirectionCommand::ROTATE_LEFT:
+          message = "ROTATE_RIGHT received.";
+          break;
+        case DirectionCommand::ROTATE_RIGHT:
+          message = "ROTATE_RIGHT received.";
+          break;
+        case DirectionCommand::STOP:
+          message = "STOP received.";
+          break;
+      }
+      buffer_udp_sender.Push(message);
+    }
+  };
 };  // namespace bb
