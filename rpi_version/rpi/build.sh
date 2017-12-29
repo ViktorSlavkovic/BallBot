@@ -44,7 +44,7 @@ function compile {
 }
 
 rpi_hostname="vs-rpi"
-rpi_ip="192.168.1.254"
+rpi_ip="192.168.2.254"
 rpi_user="pi"
 rpi_pass="12345"
 
@@ -52,6 +52,7 @@ rpi_mtpt="/tmp/rpi_fs"
 rpi_code_dir="BB"
 
 if [ "$HOSTNAME" == "$rpi_hostname" ]; then
+  # exit 0
   echo "Running a remote build..."
   mkdir $rpi_code_dir 2> /dev/null
   cd $rpi_code_dir

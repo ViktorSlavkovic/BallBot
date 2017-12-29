@@ -10,6 +10,26 @@ namespace bb {
 constexpr const int MotorController::kStepPins_[];
 constexpr const int MotorController::kDirPins_[];
 constexpr const int MotorController::kNumberOfSteppers_;
+constexpr const int MotorController::kSerPin;
+constexpr const int MotorController::kRclkPin;
+constexpr const int MotorController::kSrclkPin;
+
+void MotorController::ShiftInBit(bool x) {
+  digitalWrite(kSerPin, x ? HIGH : LOW);
+  digitalWrite(kSrclkPin, HIGH);
+  digitalWrite(kSrclkPin, LOW);
+}
+
+void MotorController::ShiftIn16(uint16_t x) {
+  uint16_t mask = 1;
+  for (int i = 0; i < 16; i++) {
+    ShiftInBit(x & mask);
+    mask <<= 1;
+  }
+  // refresh
+  digitalWrite(kRclkPin, HIGH);
+  digitalWrite(kRclkPin, LOW);
+}
 
 void MotorController::Control(SharedBuffer<MotorControlCommand>& buffer) {
   InitializeSteppers();
@@ -48,6 +68,16 @@ void MotorController::Control(SharedBuffer<MotorControlCommand>& buffer) {
 }
 
 void MotorController::InitializeSteppers() {
+  pinMode(kSerPin, OUTPUT);
+  digitalWrite(kSerPin, LOW);
+  pinMode(kSrclkPin, OUTPUT);
+  digitalWrite(kSrclkPin, LOW);
+  pinMode(kRclkPin, OUTPUT);
+  digitalWrite(kRclkPin, LOW);
+  
+  // TODO: Document all modes.
+  // This mode is 32 microsteps per step.
+  ShiftIn16(0x1F80);
   for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
     pinMode(kStepPins_[i], OUTPUT);
     pinMode(kDirPins_[i], OUTPUT);
@@ -56,8 +86,8 @@ void MotorController::InitializeSteppers() {
   }
 }
 
-constexpr uint64_t kMinGearStepMicros = 100000; // 100 ms
-constexpr uint64_t kMaxGearStepMicros = 800; // 0.8 ms
+constexpr uint64_t kMinGearStepMicros = 50000; // 50 ms
+constexpr uint64_t kMaxGearStepMicros = 600; // 0.6 ms
 
 uint64_t MotorController::GearToMicors(uint8_t gear) {
   if (!gear) return ~uint64_t(0);

@@ -35,10 +35,17 @@ public:
   static void Control(SharedBuffer<MotorControlCommand> &buffer);
 
 private:
-  static constexpr const int kStepPins_[] = {25, 23, 21};
-  static constexpr const int kDirPins_[] = {24, 22, 29};
+  // TODO: Move the constants to cc.
+  static constexpr const int kStepPins_[] = {24, 22, 1};
+  static constexpr const int kDirPins_[] = {25, 23, 21};
   static constexpr const int kNumberOfSteppers_ = 3;
 
+  static constexpr const int kSerPin = 7;
+  static constexpr const int kRclkPin = 0;
+  static constexpr const int kSrclkPin = 2;
+  
+  static void ShiftInBit(bool x); 
+  static void ShiftIn16(uint16_t x);
   static void InitializeSteppers();
   static uint64_t GearToMicors(uint8_t gear);
 };

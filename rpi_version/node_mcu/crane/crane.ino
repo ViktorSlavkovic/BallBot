@@ -8,8 +8,8 @@ extern "C" {
 const char* kWiFiSSID = "VPS";
 const char* kWiFiPassword = "milorad__senic";
 const int   kUdpServerPort = 12345;
-IPAddress ip(192, 168, 1, 253);
-IPAddress gateway(192, 168, 1, 1); 
+IPAddress ip(192, 168, 2, 253);
+IPAddress gateway(192, 168, 2, 1); 
 IPAddress subnet(255, 255, 255, 0); 
 WiFiUDP udp_server;
 const int kBufferSize = 1024;
