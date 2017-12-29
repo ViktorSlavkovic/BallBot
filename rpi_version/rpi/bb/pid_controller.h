@@ -10,10 +10,10 @@ namespace bb {
 
 class PidController {
 public:
-    // static void Control(SharedBuffer<MPUReader::Gravity>& buffer_sensor,
-    //                     SharedBuffer<MotorControlCommand>& buffer_motors);
-    static void Control(SharedBuffer<std::string>& buffer_udp_sender,
-                        SharedBuffer<bb::DirectionCommand>& buffer_direction);
+    static void Control(SharedBuffer<MPUReader::Gravity>& buffer_sensor,
+                        SharedBuffer<MotorControlCommand>& buffer_motors);
+    // static void Control(SharedBuffer<std::string>& buffer_udp_sender,
+    //                     SharedBuffer<bb::DirectionCommand>& buffer_direction);
 };
 
 };  // namespace bb
