@@ -16,7 +16,7 @@ static constexpr const double kMotorPos[] = {
 static constexpr const int kMotorInDir[] = { 0, 0, 0 };
 static constexpr const int kMotorOutDir[] = { 1, 1, 1 };
 static constexpr const double kPushAngleThreshold = kPi / 12;
-static constexpr const double kFallenAngleThreshold = kPi / 6;
+static constexpr const double kFallenAngleThreshold = kPi / 180 * 10;
 static constexpr const int kSteerLeftDir = 0;
 static constexpr const int kSteerRightDir = 1;
 static constexpr const int kTopSteerGear = 150;
@@ -58,13 +58,24 @@ void PidController::Control(
     SharedBuffer<MotorControlCommand>& buffer_motors) {
 
   MotorControlCommand command;
-
+  
+  int state = 0; // 0 - calming down, 1 - calibration, 2 - reacting
+  int num_calm_down = 3000;
+  int num_calibrate = 1000;
+  int idx_calibrate = 0;
+  bool state_transition = true;
+  double ogx = 0, ogy = 0, ogz = 0; //offsets
   while (true) {
 
     auto gravity = buffer_sensor.Pop();
     double gx = gravity.x;
     double gy = gravity.y;
     double gz = -gravity.z;
+    if (state == 2) {
+      gx -= ogx;
+      gy -= ogy;
+      gz -= ogz;
+    }
     double gxy = sqrt(gx * gx + gy * gy);
     // theta - in x-y plane (-PI, PI)
     double theta = atan2(gy, gx);
@@ -73,22 +84,72 @@ void PidController::Control(
 
     double low = theta;
     double high = angle_across(low);
+    
+    switch (state) {
+      case 0: {
+        if (state_transition) {
+          printf("Calming down...\n");
+          state_transition = false;
+        }
+        if (num_calm_down-- <= 0) {
+          state_transition = true;
+          state = 1;
+        }
+        continue;
+      }
+      case 1: {
+        if (state_transition) {
+          printf("Calibrating...\n");
+          state_transition = false;
+        }
+        if (num_calibrate-- <= 0) {
+          printf("Done calibrating - ogx: %7.2f ogy: %7.2f ogz: %7.2f\n",
+                 ogx, ogy, ogz);
+          ogz = ogz - 1.0;
+          state_transition = true;
+          state = 2;
+        }
+        if (idx_calibrate == 0) {
+          ogx = gx;
+          ogy = gy;
+          ogz = gz;
+          idx_calibrate++;
+          continue;
+        }
+        ogx *= (double) idx_calibrate / (idx_calibrate + 1.0);
+        ogy *= (double) idx_calibrate / (idx_calibrate + 1.0);
+        ogz *= (double) idx_calibrate / (idx_calibrate + 1.0);
+        idx_calibrate++;
+        ogx += gx / idx_calibrate;
+        ogy += gy / idx_calibrate;
+        ogz += gz / idx_calibrate;
+        continue;
+      }
+      case 2: {
+        if (state_transition) {
+          printf("Running...\n");
+          state_transition = false;
+        }
+        break;
+      }
+    }
 
     printf("%7.2f %7.2f %7.2f -> theta: %7.2f alpha: %7.2f\n",
-           gx, gy, -gz,
-           theta * 180 / kPi, alpha * 180 / kPi);
+    gx, gy, -gz,
+    theta * 180 / kPi, alpha * 180 / kPi);
 
     // Choosing gears...
 
-    // 1) If fallen - stop all motors.
+    // 1) If fallen - stop all motors and return.
     if (alpha > kFallenAngleThreshold) {
       for (int motor = 0; motor < 3; motor++) {
         command.dir[motor] = 0;
         command.gear[motor] = 0;
       }
       buffer_motors.Push(command);
-      continue;
+      return;
     }
+
     // 2) Move the lower two wheels towards the interior (push) if the lowest
     //    point is not too close to some of the wheels, otherwise move th
     //    higher two wheels towards the exterior (pull).
@@ -168,26 +229,4 @@ void PidController::Control(
   }
 }
 
-  // void PidController::Control(
-  //   SharedBuffer<std::string>& buffer_udp_sender,
-  //   SharedBuffer<bb::DirectionCommand>& buffer_direction){
-  //   while (true) {
-  //     std::string message;
-  //     switch (buffer_direction.Pop()) {
-  //       case DirectionCommand::FORWARD:
-  //         message = "FORWARD received.";
-  //         break;
-  //       case DirectionCommand::ROTATE_LEFT:
-  //         message = "ROTATE_RIGHT received.";
-  //         break;
-  //       case DirectionCommand::ROTATE_RIGHT:
-  //         message = "ROTATE_RIGHT received.";
-  //         break;
-  //       case DirectionCommand::STOP:
-  //         message = "STOP received.";
-  //         break;
-  //     }
-  //     buffer_udp_sender.Push(message);
-  //   }
-  // };
 };  // namespace bb

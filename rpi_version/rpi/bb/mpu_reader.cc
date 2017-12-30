@@ -43,13 +43,13 @@ void MPUReader::InitializeMpu() {
 
   if (!test_connection_ok) {
     // TODO: Report error.
-    printf("\n****************** MPU testConnection FAILED\n");
+    printf("\n******* MPU testConnection FAILED *******\n");
     exit(MPU_CONNECTION_FAILED);
   }
 
   if (dmp_init_status != 0) {
     // TODO: Report error.
-    printf("\n****************** MPU dmpInitialize FAILED\n");
+    printf("\n******* MPU dmpInitialize FAILED *******\n");
     exit(MPU_DMP_INIT_FAILED);
   }
 }
@@ -62,7 +62,7 @@ void MPUReader::Read(SharedBuffer<Gravity>& buffer) {
 
   InitializeMpu();
 
-  printf("\n****************** Sucessfully initialized MPU...\n");
+  printf("\n******* Sucessfully initialized MPU *******\n");
 
   while (true) {
     fifoCount = mpu.getFIFOCount();

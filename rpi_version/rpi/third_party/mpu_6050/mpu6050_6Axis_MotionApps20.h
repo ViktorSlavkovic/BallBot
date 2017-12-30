@@ -60,7 +60,6 @@ THE SOFTWARE.
 // after moving string constants to flash memory storage using the F()
 // compiler macro (Arduino IDE 1.0+ required).
 
-#define DEBUG
 #ifdef DEBUG
     #define DEBUG_PRINT(x) std::cout << x
     #define DEBUG_PRINTF(x, y) std::cout << (x) << " " << (#y)

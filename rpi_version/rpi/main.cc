@@ -1,10 +1,11 @@
+#include "bb/command_receiver.h"
+#include "bb/floor_controller.h"
 #include "bb/motor_controller.h"
 #include "bb/mpu_reader.h"
 #include "bb/pid_controller.h"
-#include "bb/floor_controller.h"
-#include "util/shared_buffer.h"
 #include "bb/udp_sender.h"
-#include "bb/command_receiver.h"
+#include "crane/crane_controller.h"
+#include "util/shared_buffer.h"
 
 #include <chrono>
 #include <cstdio>
@@ -14,67 +15,40 @@
 
 #include <wiringPi.h>
 
+util::SharedBuffer<bb::MotorControlCommand> motors_buffer(5);
+util::SharedBuffer<bb::MPUReader::Gravity> sensors_buffer(5);
+
+double evaluate(/* parameters */) {
+  crane::CraneController::Instance().Rise();
+  crane::CraneController::Instance().Drop(20);
+  auto t = std::chrono::system_clock::now();
+  std::this_thread::sleep_for(std::chrono::seconds(30));    
+  std::thread pid_controller_thread(bb::PidController::Control,
+    std::ref(sensors_buffer), std::ref(motors_buffer));
+  std::this_thread::sleep_for(std::chrono::seconds(90));  
+  crane::CraneController::Instance().Drop(150);
+  pid_controller_thread.join();
+  auto d = std::chrono::system_clock::now() - t;
+  auto dsec = std::chrono::duration_cast<std::chrono::milliseconds>(d) * 0.001;
+  printf("Fallen in %10.3f sec!\n", dsec);
+}
+
 int main(int argc, char* argv[]) {
   wiringPiSetup();
-
-  // util::SharedBuffer<bb::DirectionCommand> direction_buffer;
-  util::SharedBuffer<bb::MotorControlCommand> motors_buffer;
-  util::SharedBuffer<bb::MPUReader::Gravity> sensors_buffer;
-  
-  // std::thread cmd_thread(bb::CommandReceiver::Receive,
-  //                        std::ref(direction_buffer),
-  //                        54321);
-
-
+  // Dispatch motor controller thread.
   std::thread motor_controller_thread(bb::MotorController::Control,
                                       std::ref(motors_buffer));
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  std::thread pid_controller_thread(bb::PidController::Control,
-      std::ref(sensors_buffer), std::ref(motors_buffer));
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  // std::thread floor_thread(bb::FloorController::Control,
-  //                                   std::ref(direction_buffer),
-  //                                   std::ref(motors_buffer));
-  // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
+  // Dispatch mpu reader thread.
   std::thread mpu_reader_thread(bb::MPUReader::Read, std::ref(sensors_buffer));
-  
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // Evaluate once.
+  crane::CraneController::Instance().Drop(20);  
+  evaluate();
+  crane::CraneController::Instance().Rise();
+  crane::CraneController::Instance().Drop(20);
+
   getchar();
   std::terminate();
-  // // printf("Terminating MPU reader thread...\n");
-  // // mpu_reader_thread.terminate();
-  // // printf("Terminating PID controller exited...\n");  
-  // // pid_controller_thread.join();
-  // // printf("Terminating motor controller exited...\n");      
-  // // motor_controller_thread.join();
-  
-  // bb::MotorControlCommand command;
-
-  // for (int motor = 0; motor < 3; motor++) {
-  //   command.dir[motor] = 0;
-  //   command.gear[motor] = 1;
-  // }
-  // motors_buffer.Push(command);
-  // std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-  // getchar();
-  // std::terminate();
-  
-  // // while (true) {
-  // //   for (int dir = 0; dir < 2; dir++) {
-  // //     for (int gear = 0; gear < 256; gear++) {
-  // //       printf("MAIN Gear: %d Dir:%d\n", gear, dir);
-  // //       for (int motor = 0; motor < 3; motor++) {
-  // //         command.dir[motor] = dir;
-  // //         command.gear[motor] = gear;
-  // //       }
-  // //       motors_buffer.Push(command);
-  // //       std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  // //     }
-  // //   }
-  // // }
-  
   return 0;
 }
