@@ -12,19 +12,23 @@ using util::SharedBuffer;
 struct MotorControlCommand {
   uint8_t dir[NUMBER_OF_STEPPERS];
   uint8_t gear[NUMBER_OF_STEPPERS];
+  bool enabled[3];
 
   MotorControlCommand() {
     for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
       this->dir[i] = 0;
       this->gear[i] = 0;
+      this->enabled[i] = true;
     }
   }
 
   MotorControlCommand(const uint8_t dir[NUMBER_OF_STEPPERS],
-                      const uint8_t gear[NUMBER_OF_STEPPERS]) {
+                      const uint8_t gear[NUMBER_OF_STEPPERS],
+                      const bool enabled[NUMBER_OF_STEPPERS]) {
     for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
       this->dir[i] = dir[i];
       this->gear[i] = gear[i];
+      this->enabled[i] = enabled[i];
     }
   }
 };
@@ -44,8 +48,10 @@ private:
   static constexpr const int kRclkPin = 0;
   static constexpr const int kSrclkPin = 2;
   
+  static uint16_t curr_config;
   static void ShiftInBit(bool x); 
   static void ShiftIn16(uint16_t x);
+  static void SetEnabled(const bool enabled[NUMBER_OF_STEPPERS]);
   static void InitializeSteppers();
   static uint64_t GearToMicors(uint8_t gear);
 };

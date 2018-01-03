@@ -13,6 +13,8 @@ constexpr const int MotorController::kNumberOfSteppers_;
 constexpr const int MotorController::kSerPin;
 constexpr const int MotorController::kRclkPin;
 constexpr const int MotorController::kSrclkPin;
+uint16_t MotorController::curr_config;
+
 
 void MotorController::ShiftInBit(bool x) {
   digitalWrite(kSerPin, x ? HIGH : LOW);
@@ -43,7 +45,9 @@ void MotorController::Control(SharedBuffer<MotorControlCommand>& buffer) {
   };
   
   while (true) {
-    buffer.TryPop(command);
+    if (buffer.TryPop(command)) {
+      SetEnabled(command.enabled);
+    }
     
     auto t = std::chrono::system_clock::now();    
     bool tick = false;
@@ -77,7 +81,7 @@ void MotorController::InitializeSteppers() {
   
   // TODO: Document all modes.
   // This mode is 32 microsteps per step.
-  ShiftIn16(0x1F80);
+  ShiftIn16(curr_config = 0x1F80);
   for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
     pinMode(kStepPins_[i], OUTPUT);
     pinMode(kDirPins_[i], OUTPUT);
@@ -93,6 +97,22 @@ uint64_t MotorController::GearToMicors(uint8_t gear) {
   if (!gear) return ~uint64_t(0);
   uint64_t step = (kMinGearStepMicros - kMaxGearStepMicros) / 254;
   return kMaxGearStepMicros + (255 - gear) * step;
+}
+
+void MotorController::SetEnabled(const bool enabled[NUMBER_OF_STEPPERS]) {
+  auto old = curr_config;
+  uint16_t mask = 0x2000;
+  for (int i = 0; i < NUMBER_OF_STEPPERS; i++) {
+    if (enabled[i]) {
+      curr_config &= (~mask); 
+    } else {
+      curr_config |= mask;
+    }
+    mask <<= 1;
+  }
+  if ((old & 0xE000) != (curr_config & 0xE000)) {
+    ShiftIn16(curr_config);
+  }
 }
 
 }; //namespace bb

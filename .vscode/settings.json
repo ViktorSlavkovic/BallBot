@@ -40,7 +40,20 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "utility": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "csignal": "cpp",
+        "cstdarg": "cpp",
+        "atomic": "cpp",
+        "hash_map": "cpp",
+        "strstream": "cpp",
+        "bitset": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "fstream": "cpp",
+        "future": "cpp",
+        "iomanip": "cpp",
+        "iostream": "cpp",
+        "numeric": "cpp"
     },
     "editor.rulers": [80]
 }

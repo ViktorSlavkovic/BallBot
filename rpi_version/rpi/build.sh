@@ -44,7 +44,7 @@ function compile {
 }
 
 rpi_hostname="vs-rpi"
-rpi_ip="192.168.2.254"
+rpi_ip="vs-bgnet.ddns.net"
 rpi_user="pi"
 rpi_pass="12345"
 
