@@ -53,7 +53,8 @@
         "future": "cpp",
         "iomanip": "cpp",
         "iostream": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "*.ipp": "cpp"
     },
     "editor.rulers": [80]
 }

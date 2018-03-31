@@ -13,7 +13,7 @@ static constexpr const double kMotorPos[] = {
    25 * kPi / 180,
   -95 * kPi / 180
 };
-static constexpr const double kFallenAngleThreshold = kPi / 180 * 15;
+static constexpr const double kFallenAngleThreshold = kPi / 180 * 12;
 static constexpr const int kSteerLeftDir = 0;
 static constexpr const int kSteerRightDir = 1;
 static constexpr const int kTopSteerGear = 150;
@@ -156,8 +156,8 @@ void PidController::Control(
 
     // 2) Handle reaction state - the actual balancing.
     
-    printf("%7.2f %7.2f %7.2f -> theta: %7.2f alpha: %7.2f\t",
-           gx, gy, -gz, theta * 180 / kPi, alpha * 180 / kPi);
+    // printf("%7.2f %7.2f %7.2f -> theta: %7.2f alpha: %7.2f\t",
+    //        gx, gy, -gz, theta * 180 / kPi, alpha * 180 / kPi);
     
     //   2.1) If fallen - stop all motors and return.
     if (alpha > kFallenAngleThreshold) {
@@ -193,13 +193,14 @@ void PidController::Control(
               [](const dists& lhs, const dists& rhs) -> bool {
       return lhs.dist_low < rhs.dist_low;
     });
-    // Sanity logging.
-    for (int i = 0; i < 3; i++) {
-      printf("| %d %7.2f ",
-             motor_dists[i].idx,
-             motor_dists[i].dist_low * 180 / kPi);
-    }
-    printf("\n");
+    
+    // // Sanity logging.
+    // for (int i = 0; i < 3; i++) {
+    //   printf("| %d %7.2f ",
+    //          motor_dists[i].idx,
+    //          motor_dists[i].dist_low * 180 / kPi);
+    // }
+    // printf("\n");
 
     // Are we pulling or pushing?
 

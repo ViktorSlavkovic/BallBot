@@ -29,7 +29,7 @@ function compile {
       fi
       cd $base_directory/$path/
       # g++ -I$base_directory/ -O3 -c $f -o $base_directory/objs/$path/$base_noext.o
-      g++ --std=c++0x -I$base_directory/ -g -c $f -o $base_directory/objs/$path/$base_noext.o
+      g++ --std=c++0x -Werror=return-type -I$base_directory/ -g -c $f -o $base_directory/objs/$path/$base_noext.o
       if [[ $? -ne 0 ]]; then
         echo -e "${RED}^ ${base}${NC}"
         cd - > /dev/null
@@ -44,7 +44,7 @@ function compile {
 }
 
 rpi_hostname="vs-rpi"
-rpi_ip="vs-bgnet.ddns.net"
+rpi_ip="vs-rpi" #"vs-bgnet.ddns.net"
 rpi_user="pi"
 rpi_pass="12345"
 
@@ -58,7 +58,7 @@ if [ "$HOSTNAME" == "$rpi_hostname" ]; then
   cd $rpi_code_dir
   base_directory=$PWD
   compile "."
-  g++ --std=c++0x -g $obj_files_list -o $base_directory/run -lboost_system -lwiringPi -lpthread
+  g++ --std=c++0x -Werror=return-type -g $obj_files_list -o $base_directory/run -lboost_system -lwiringPi -lpthread
 else
   echo "Uploading code to the Raspberry Pi..."
   fusermount -u $rpi_mtpt 2> /dev/null
