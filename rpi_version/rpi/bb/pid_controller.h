@@ -22,6 +22,7 @@ using std::string;
 
 constexpr const double kPi = 3.14159265358979323846; 
 
+// TODO: Rename, this is not PID.
 class PidController {
 public:
     struct ParameterSet {

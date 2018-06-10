@@ -14,6 +14,7 @@
 #include <exception>
 #include <fstream>
 #include <functional>
+#include <iomanip>
 #include <sstream>
 #include <thread>
 #include <unordered_map>
@@ -33,7 +34,7 @@ double evaluate(const bb::PidController::ParameterSet& params) {
   std::thread pid_controller_thread(bb::PidController::Control,
     std::ref(sensors_buffer), std::ref(motors_buffer), params);
   std::this_thread::sleep_for(std::chrono::seconds(90));  
-  crane::CraneController::Instance().Drop(1700);
+  crane::CraneController::Instance().Drop(2100);
   std::this_thread::sleep_for(std::chrono::seconds(5));
   crane::CraneController::Instance().ControlTreadmill(true /*start*/);
   pid_controller_thread.join();
@@ -107,7 +108,7 @@ void store_used_params(const std::string& path) {
   fout << used_params.size() << std::endl;
   for (auto p : used_params) {
     fout << bb::PidController::ParameterSet(p.first);
-    fout << p.second << std::endl;
+    fout << std::fixed << std::setprecision(5) << p.second << std::endl;
   }
 
   fout.close();
@@ -115,7 +116,7 @@ void store_used_params(const std::string& path) {
 
 bb::PidController::ParameterSet get_best_params() {
   std::string best = "";
-  double best_val = 1.0e10;
+  double best_val = -1.0e10;
   for (const auto& p : used_params) {
     if (p.second > best_val) {
       best = p.first;
@@ -125,6 +126,7 @@ bb::PidController::ParameterSet get_best_params() {
   if (best == "") {
     return bb::PidController::ParameterSet::Generate();
   }
+  printf("\nRunning with best known params - duration: %.3f.\n", best_val);
   return bb::PidController::ParameterSet(best);
 }
 
